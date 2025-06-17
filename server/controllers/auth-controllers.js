@@ -877,6 +877,7 @@ async function updateProductInDatabase(productData) {
             image_id: variant.image_id,
             inventory_quantity: variant.inventory_quantity ?? 0,
             inventory_policy: variant.inventory_policy ?? "deny",
+            inventory_management: variant.inventory_management === "shopify" ? "shopify" : null
           })) ?? [],
       },
       { upsert: true, new: true }
