@@ -79,6 +79,9 @@ const productSchema = new mongoose.Schema({
         },
         inventory_policy: {
             type: String
+        },
+        inventory_management:{
+            type: String
         }
     }]
 });

@@ -190,6 +190,7 @@ const syncProductFromShopify = async (req, res) => {
                 inventory_item_id: variant.inventory_item_id,
                 inventory_quantity: variant.inventory_quantity ?? 0,
                 inventory_policy: variant.inventory_policy ?? "deny",
+                inventory_management: variant.inventory_management === "shopify" ? "shopify" : null
               })) ?? [],
           };
 
