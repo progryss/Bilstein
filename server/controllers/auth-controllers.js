@@ -859,6 +859,22 @@ const productWebhook = (req, res) => {
 
 async function updateProductInDatabase(productData) {
   try {
+
+    const existingProduct = await Product.findOne({ productId: productData.id }).lean();
+    const mergedVariants = productData.variants?.map((variant) => {
+      const oldVariant = existingProduct?.variants?.find(v => v.id == variant.id) || {};
+      return {
+        id: variant.id,
+        sku: variant.sku,
+        price: variant.price,
+        compare_at_price: variant.compare_at_price,
+        image_id: variant.image_id,
+        inventory_quantity: variant.inventory_quantity ?? 0,
+        inventory_policy: variant.inventory_policy ?? "deny",
+        inventory_management: oldVariant.inventory_management
+      };
+    }) ?? [];
+
     // Assuming a MongoDB database with Mongoose
     await Product.findOneAndUpdate(
       { productId: productData.id },
@@ -868,17 +884,7 @@ async function updateProductInDatabase(productData) {
         image_src: productData?.image?.src ?? "",
         images: productData?.images ?? [],
         tags: productData?.tags ?? [],
-        variants:
-          productData?.variants?.map((variant) => ({
-            id: variant.id,
-            sku: variant.sku,
-            price: variant.price,
-            compare_at_price: variant.compare_at_price,
-            image_id: variant.image_id,
-            inventory_quantity: variant.inventory_quantity ?? 0,
-            inventory_policy: variant.inventory_policy ?? "deny",
-            inventory_management: variant.inventory_management === "shopify" ? "shopify" : null
-          })) ?? [],
+        variants:mergedVariants
       },
       { upsert: true, new: true }
     );
